@@ -105,10 +105,10 @@ def svg_to_image_and_json(svg_paths, output_dir="."):
                     cv2.fillPoly(mask, [simplified_pts], 1)
 
                     # bounding box
-                    x, y, w, h = cv2.boundingRect(pts)
+                    x, y, w, h = cv2.boundingRect(simplified_pts)
 
                     # area
-                    area = float(cv2.contourArea(pts))
+                    area = float(cv2.contourArea(simplified_pts))
 
                     # segmentation (RLE)
                     rle = maskUtils.encode(np.asfortranarray(mask.astype(np.uint8)))
@@ -149,5 +149,6 @@ def svg_to_image_and_json(svg_paths, output_dir="."):
 
         print(f"Saved: {output_img}, {output_json}")
         results.append({"image": output_img, "json": output_json})
+
 
     return results
