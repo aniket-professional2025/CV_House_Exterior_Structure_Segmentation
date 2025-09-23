@@ -12,7 +12,7 @@ from svgpathtools import parse_path
 import pycocotools.mask as maskUtils
 
 # Function to convert svg image into a RoboFlow style SAM dataset
-def svg_to_image_and_json(svg_paths, output_dir="."):
+def svg_to_image_and_json(svg_paths, output_dir = "."):
     """
     Convert one or multiple SVG files into a 1024x1024 JPG image
     and corresponding JSON annotations.

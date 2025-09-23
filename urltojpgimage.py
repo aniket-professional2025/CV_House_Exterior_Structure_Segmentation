@@ -2,6 +2,8 @@
 import os
 import pandas as pd
 import requests
+from PIL import Image
+from io import BytesIO
 
 # Define function That takes the Excel file and a directory to store the Images in jpg format
 def download_images_from_excel(excel_file: str, output_dir: str):
@@ -18,8 +20,8 @@ def download_images_from_excel(excel_file: str, output_dir: str):
         return
 
     # Check if 'ImageURL' and 'Name' columns exist
-    if 'ImageURL' not in df.columns or 'Name' not in df.columns:
-        print("Error: The Excel file must contain 'ImageURL' and 'Name' columns.")
+    if 'imageUploaded' not in df.columns or 'id' not in df.columns:
+        print("Error: The Excel file must contain 'imageUploaded' and 'id' columns.")
         return
 
     # Create the output directory if it doesn't exist
@@ -29,8 +31,8 @@ def download_images_from_excel(excel_file: str, output_dir: str):
 
     # Iterate through the DataFrame rows
     for index, row in df.iterrows():
-        image_url = row['ImageURL']
-        name = row['Name']
+        image_url = row['imageUploaded']
+        name = row['id']
         
         # Create the filename as Image_1.jpg, Image_2.jpg, etc.
         filename = f"Image_{index + 1}.jpg"
@@ -43,9 +45,20 @@ def download_images_from_excel(excel_file: str, output_dir: str):
             
             # Check if the request was successful
             if response.status_code == 200:
-                with open(filepath, 'wb') as f:
-                    f.write(response.content)
-                print(f"Successfully saved: {filename}")
+                # Use BytesIO to handle image in memory without saving first
+                image_data = BytesIO(response.content)
+                img = Image.open(image_data)
+
+                # Convert RGBA to RGB if necessary before saving as JPEG
+                if img.mode == 'RGBA':
+                    img = img.convert('RGB')
+
+                # Resize the image to 1024x1024 pixels
+                resized_img = img.resize((1024, 1024), Image.Resampling.LANCZOS)
+
+                # Save the Resized Image
+                resized_img.save(filepath, "JPEG")
+                print(f"Successfully downloaded, resized, and saved: {filename}")
             else:
                 print(f"Failed to download image from {image_url}. Status code: {response.status_code}")
         except requests.exceptions.RequestException as e:
@@ -55,7 +68,7 @@ def download_images_from_excel(excel_file: str, output_dir: str):
 
 if __name__ == "__main__":
     # Define your input file and output directory
-    input_excel_file = 'CleanData.xlsx'
+    input_excel_file = 'CompleteData.xlsx'
     output_images_dir = 'Outputs'
 
     # Call the function to start the process

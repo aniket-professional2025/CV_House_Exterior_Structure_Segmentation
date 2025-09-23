@@ -94,7 +94,7 @@ def process_paths_to_json(paths_dict: dict, output_filepath: str):
     print(f"Processing finished for file: {os.path.basename(output_filepath)}")
 
 if __name__ == "__main__":
-    input_excel_file = 'CleanData.xlsx'
+    input_excel_file = 'CompleteData.xlsx'
     output_dir = 'Outputs'
 
     try:
@@ -107,8 +107,8 @@ if __name__ == "__main__":
         print(f"An error occurred while reading the Excel file: {e}")
         exit()
 
-    if 'Paths' not in df.columns or 'Name' not in df.columns:
-        print("Error: The Excel file must contain 'Paths' and 'Name' columns.")
+    if 'paths' not in df.columns or 'id' not in df.columns:
+        print("Error: The Excel file must contain 'paths' and 'id' columns.")
         exit()
 
     os.makedirs(output_dir, exist_ok=True)
@@ -116,9 +116,9 @@ if __name__ == "__main__":
 
     for index, row in df.iterrows():
         try:
-            paths_str = row['Paths']
+            paths_str = row['paths']
             paths_dict = json.loads(paths_str)
-            name = row['Name']
+            name = row['id']
             
             output_filename = f"Image_{index + 1}.json"
             output_filepath = os.path.join(output_dir, output_filename)
